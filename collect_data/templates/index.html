@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" />
+    <title>Price comparision</title>
+  </head>
+  <body>
+    <div class="search">
+      <form method="post">
+        <input type="text" name="search" />
+        {% csrf_token %}
+        <button type="submit" class="btn">search</button>
+      </form>
+    </div>
+
+    <div class="lists">
+      {% if products %} {% for product in products %}
+      <div class="list">
+        <div class="img">
+          <img src="{{product.image}}" alt="{{product.title}}" />
+        </div>
+        <div class="details">
+          <a href="{{product.link}}">{{product.title}}</a>
+          <p>{{product.price}}</p>
+          <p>{{product.from}}</p>
+        </div>
+      </div>
+      {% endfor %} {% endif %}
+    </div>
+  </body>
+</html>
