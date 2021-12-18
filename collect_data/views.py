@@ -2,6 +2,10 @@ from bs4 import BeautifulSoup
 import requests
 from django.views.generic import View
 from django.shortcuts import render
+from .models import WishList
+from user.models import CustomUser
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 class Index(View):
 
@@ -11,6 +15,8 @@ class Index(View):
 
     def post(self, request):
         search_input = request.POST['search']
+
+        
 
         urls = [
         {
@@ -33,7 +39,9 @@ class Index(View):
         products = []
         for url in urls:
             search_url = url['link'] + search_input
+            # check_internet_connection(request, search_url)
             req = requests.get(search_url)
+            
 
             soup = BeautifulSoup(req.content, 'html5lib')
 
@@ -93,3 +101,44 @@ class Index(View):
                     products.append(product)
 
         return render(request, self.template, {'products':products})
+
+
+# @login_required
+# def wished_product(request):
+#     if request.method=="POST":
+#         user = request.user
+#         title = request.POST.get("title")
+#         link = request.POST.get("link")
+#         price = request.POST.get("price")
+#         if price:
+#             price = int(''.join([i for i in price if i.isdigit()]))
+#         wanted_price = request.POST.get("wished_price")
+#         if price <= wanted_price:
+#             messages.warning(request, "Available price is already lesseer, why do you want ?")
+#         else:
+#             data= WishList(title=title,url=link,available_price=price,wanted_price=wanted_price,user=user)
+#             data.save()
+#             messages.success(request,"If your wished_price is less than available_price , alert message in the email will shown.")
+#     return render(request, 'index.html')
+
+@login_required
+def wished_product_form(request):
+    if request.method=="POST":
+        user= request.user
+        title= request.POST.get("title")
+        link= request.POST.get("link")
+        available_price= request.POST.get("price")
+        if available_price:
+            available_price = int(''.join([i for i in price if i.isdigit()]))
+        wanted_price = request.POST.get("wished_price")
+        if available_price <= wanted_price:
+            messages.warning(request, "Available price is already lesseer, why do you want ?")
+        else:
+            data= WishList(title=title,url=link,available_price=available_price,wanted_price=wanted_price,user=user)
+            data.save()
+            messages.success(request,"If your wished_price is less than available_price , alert message in the email will shown.")
+    return render(request,'wished_product_form.html')
+
+    
+        
+    
