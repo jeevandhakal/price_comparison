@@ -10,9 +10,6 @@ from django.core.mail import send_mail
 import datetime
 from pytz import utc
 
-#  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
-
-# Create your views here.\
 
 def send_otp(user):
     usr_otp = random.randint(10000,99999)
@@ -67,7 +64,7 @@ def signup(request):
         
     return render(request,'user/signup.html',{'form':form})
 
-def signin(request):#jeeban@gmail.com, ganeshkhana@, testing321
+def signin(request):
     if request.method=="POST":
         get_otp=request.POST.get('otp')
 
