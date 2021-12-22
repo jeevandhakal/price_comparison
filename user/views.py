@@ -11,9 +11,6 @@ import datetime
 from pytz import utc
 
 
-
-# Create your views here.\
-
 def send_otp(user):
     usr_otp = random.randint(10000,99999)
     UserOTP.objects.create(user=user,otp=usr_otp)
