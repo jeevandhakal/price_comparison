@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 import datetime
 from pytz import utc
 
-#  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
+
 
 # Create your views here.\
 
@@ -36,13 +36,13 @@ def signup(request):
             user= CustomUser.objects.get(email=get_eml)
             user_otp = UserOTP.objects.filter(user=user).last()
             timestamp = datetime.timedelta.total_seconds(datetime.datetime.now(utc) - user_otp.time_st)
-            if int(get_otp) == user_otp.otp and timestamp <= 60:
+            if int(get_otp) == user_otp.otp and timestamp <= 300:
                 user.is_active = True
                 user.save()
                 messages.success(request,f"Account has been created for {user.first_name} You can login now!!")
                 return redirect("signin")
             
-            elif int(get_otp) == user_otp.otp and timestamp >= 60:
+            elif int(get_otp) == user_otp.otp and timestamp >= 300:
                 messages.warning(request,"OTP has been expired New OTP has been sent to your mail and enter new otp !!")
                 user_otp.delete()
                 send_otp(user)
@@ -67,7 +67,7 @@ def signup(request):
         
     return render(request,'user/signup.html',{'form':form})
 
-def signin(request):#jeeban@gmail.com, ganeshkhana@, testing321
+def signin(request):
     if request.method=="POST":
         get_otp=request.POST.get('otp')
 

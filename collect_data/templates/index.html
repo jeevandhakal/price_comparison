@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
 {% block content %}
 
   <div class="search">
-    <form method="post">
-      <input type="text" name="search" />
-      {% csrf_token %}
+    <form method="get" action='{% url 'search' %}'>
+      <input type="search" name="search" />
       <button type="submit" class="btn">search</button>
     </form>
   </div>
@@ -21,11 +21,9 @@
             <a href="{{product.link}}">{{product.title}}</a>
             <p>{{product.price}}</p>
             <p>{{product.from}}</p>
-                    <a href="{% url 'wished_product_form' %}"><input type="submit" class="btn btn-success btn-lg" value="Add to Wishlist"></a>
+                    <a href="{% url 'wished_product_form' product.id %}"><input type="submit" class="btn btn-success btn-lg" value="Add to Wishlist"></a>
                    
       </div>
-
-     
       
     </div>
    

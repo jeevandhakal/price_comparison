@@ -3,10 +3,11 @@
    <div class="container my-4">
       <form method="POST" action="">
          {% csrf_token %}
+      
+      {% if title %}
+      <p>Enter price for {{title}} that you wish</p> 
+      {% endif %}
       <label>Wanted Price</label><br>
-      <input type="hidden" name="title">
-      <input type="hidden" name="price">
-      <input type="hidden" name="link">
       <input type="text" class="form-control" name="wished_price"><br>
       <input type="submit" class="btn btn-primary" value="Confirm Wishlist Price" >
       </form>
