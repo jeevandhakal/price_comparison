@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from .managers import CustomUserManager
-import datetime
+
 
 
 class CustomUser(AbstractUser):
@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.first_name +' '+ self.last_name
+        return self.email
 
 
 class UserOTP(models.Model):

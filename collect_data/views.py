@@ -2,12 +2,16 @@ from bs4 import BeautifulSoup
 import requests
 from django.views.generic import View
 from django.shortcuts import render
+
 from .models import WishList
 from user.models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
 from django.views.decorators.cache import cache_page
 from datetime import datetime
+from django.shortcuts import redirect
+from decimal import Decimal 
 
 def index(request):
     return render(request, 'index.html')
@@ -102,9 +106,9 @@ def search(request):
                 product['image'] = "https://www.meroshopping.com/" + div.select_one('img')['src']
                 product['id'] = int(datetime.now().strftime("%Y%m%d%H%M%S%f"))
                 products.append(product)
-    search_input = '_'.join(search_input.split())
-    request.session[search_input] = products
-    return render(request, 'index.html', {'products':products})
+    
+    request.session['products'] = products
+    return render(request, 'index.html', {'products':products,})
 
 
 # @login_required
@@ -129,18 +133,21 @@ def search(request):
 def wished_product_form(request, id):
     if request.method=="POST":
         user= request.user
+        products = request.session['products']
+        for pdr in products:
+            if pdr['id'] == id:
+                product = pdr
         
-        if available_price:
-            available_price = int(''.join([i for i in price if i.isdigit()]))
-        wanted_price = request.POST.get("wished_price")
+        if product['price']:
+            available_price = int(''.join([i for i in product['price'] if i.isdigit()]))
+        wanted_price = int(request.POST.get("wished_price"))
         if available_price <= wanted_price:
-            messages.warning(request, "Available price is already lesseer, why do you want ?")
+            messages.warning(request, "Available price is already less, why do you want ?")
         else:
-            data= WishList(title=title,url=link,available_price=available_price,wanted_price=wanted_price,user=user)
-            data.save()
+            WishList.objects.create(title=product['title'], url=product['link'], available_price=available_price, wanted_price=wanted_price, user=user)
             messages.success(request,"If your wished_price is less than available_price , alert message in the email will shown.")
             return redirect('index')
-    return render(request,'wished_product_form.html', {'title':title})
+    return render(request,'wished_product_form.html', {'id':id})
 
     
         

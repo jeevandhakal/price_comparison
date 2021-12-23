@@ -1,15 +1,24 @@
-{% extends 'base.html' %}
-{% block content %}
-   <div class="container my-4">
-      <form method="POST" action="">
-         {% csrf_token %}
-      
-      {% if title %}
-      <p>Enter price for {{title}} that you wish</p> 
-      {% endif %}
-      <label>Wanted Price</label><br>
-      <input type="text" class="form-control" name="wished_price"><br>
-      <input type="submit" class="btn btn-primary" value="Confirm Wishlist Price" >
-      </form>
-   </div>
+{% extends 'base.html' %} {% block content %}
+<div class="container my-4">
+  <form method="POST" action="">
+    {% if id %}
+    <div>
+      {% for product in request.session.products %} {% if product.id == id %}
+      <p>
+        Enter price for {{product.title}} that you wish, which is available for
+        {{product.price}}
+      </p>
+      {% endif %} {% endfor %}
+    </div>
+    {% endif %}
+    <label>Wanted Price</label><br />
+    <input type="text" class="form-control" name="wished_price" /><br />
+    {% csrf_token %}
+    <input
+      type="submit"
+      class="btn btn-primary"
+      value="Confirm Wishlist Price"
+    />
+  </form>
+</div>
 {% endblock %}
