@@ -111,24 +111,6 @@ def search(request):
     return render(request, 'index.html', {'products':products,})
 
 
-# @login_required
-# def wished_product(request):
-#     if request.method=="POST":
-#         user = request.user
-#         title = request.POST.get("title")
-#         link = request.POST.get("link")
-#         price = request.POST.get("price")
-#         if price:
-#             price = int(''.join([i for i in price if i.isdigit()]))
-#         wanted_price = request.POST.get("wished_price")
-#         if price <= wanted_price:
-#             messages.warning(request, "Available price is already lesseer, why do you want ?")
-#         else:
-#             data= WishList(title=title,url=link,available_price=price,wanted_price=wanted_price,user=user)
-#             data.save()
-#             messages.success(request,"If your wished_price is less than available_price , alert message in the email will shown.")
-#     return render(request, 'index.html')
-
 @login_required
 def wished_product_form(request, id):
     if request.method=="POST":
@@ -144,7 +126,13 @@ def wished_product_form(request, id):
         if available_price <= wanted_price:
             messages.warning(request, "Available price is already less, why do you want ?")
         else:
-            WishList.objects.create(title=product['title'], url=product['link'], available_price=available_price, wanted_price=wanted_price, user=user)
+            WishList.objects.create(
+                title=product['title'],
+                url=product['link'],
+                available_price=available_price, 
+                wanted_price=wanted_price, user=user, 
+                site=product['from']
+            )
             messages.success(request,"If your wished_price is less than available_price , alert message in the email will shown.")
             return redirect('index')
     return render(request,'wished_product_form.html', {'id':id})
