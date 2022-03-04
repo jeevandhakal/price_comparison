@@ -65,43 +65,48 @@ def signup(request):
     return render(request,'user/signup.html',{'form':form})
 
 def signin(request):
-    if request.method=="POST":
-        get_otp=request.POST.get('otp')
+    if not request.user.is_authenticated:
 
-        if get_otp:
-            get_eml=request.POST.get('email')
-            user=CustomUser.objects.get(email=get_eml)
-            
-            if int(get_otp) == UserOTP.objects.filter(user=user).last().otp:
-                user.is_active=True
-                user.save()
+        if request.method=="POST":
+            get_otp=request.POST.get('otp')
+
+            if get_otp:
+                get_eml=request.POST.get('email')
+                user=CustomUser.objects.get(email=get_eml)
+                
+                if int(get_otp) == UserOTP.objects.filter(user=user).last().otp:
+                    user.is_active=True
+                    user.save()
+                    login(request,user)
+                    return redirect('index')
+                else:
+                    messages.info(request,"Your OTP has been incorrect!!")
+                    return render(request,'user/signin.html',{'otp':True,'user':user})
+
+            email= request.POST["email"]
+            password= request.POST["password"]
+            user= authenticate(request,email=email,password=password)
+
+            if user is not None:
                 login(request,user)
-                return redirect('index')
-            else:
-                messages.info(request,"Your OTP has been incorrect!!")
+                messages.success(request,"Successfully loggedin")
+                return redirect("index")
+
+            elif not CustomUser.objects.filter(email=email).exists():
+                messages.warning(request,"Invalid Credentials")
+                return redirect("signin")
+
+            elif not CustomUser.objects.get(email=email).is_active:
+                user=CustomUser.objects.get(email=email)
+                messages.warning(request,"Firstafall OTP must be entered")
                 return render(request,'user/signin.html',{'otp':True,'user':user})
 
-        email= request.POST["email"]
-        password= request.POST["password"]
-        user= authenticate(request,email=email,password=password)
-
-        if user is not None:
-            login(request,user)
-            messages.success(request,"Successfully loggedin")
-            return redirect("index")
-
-        elif not CustomUser.objects.filter(email=email).exists():
-            messages.warning(request,"Invalid Credentials")
-            return redirect("signin")
-
-        elif not CustomUser.objects.get(email=email).is_active:
-            user=CustomUser.objects.get(email=email)
-            messages.warning(request,"Firstafall OTP must be entered")
-            return render(request,'user/signin.html',{'otp':True,'user':user})
-
-        else:
-            messages.info(request,"Please enter correct credentials")
-            return redirect("signin")
+            else:
+                messages.info(request,"Please enter correct credentials")
+                return redirect("signin")
+    else:
+        messages.info(request,"You have already logged in!")
+        return redirect('index')
 
     return render(request,'user/signin.html')
 

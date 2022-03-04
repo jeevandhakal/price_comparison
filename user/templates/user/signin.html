@@ -1,26 +1,29 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% block content %}
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block content %}
 <div class="container col-md-6">
-{% if otp %}
-   <h1>Verify Your OTP</h1><br>
-            
-            <form method="POST" action="">
-            {% csrf_token %}
-                <input type="text" class="form-control" placeholder="Enter Your OTP" name="otp"><br>
-                <input type="hidden" name="email" value="{{user.email}}">
-                <input type="submit" class="btn btn-success" value="Verify OTP">
-            </form>
-{% else %}
-        <form method="POST" action="">
-          {% csrf_token %}
-            <label>Email</label>
-            <input type="email" class="form-control" name="email">
-            <label>Password</label>
-            <input type="password" class="form-control" name="password">
-          <input type="submit" class="btn btn-success" value="Login">
+  {% if otp %}
+  <h1>Verify Your OTP</h1>
+  <br />
 
-        </form>
-{% endif %}
-  </div>
+  <form method="POST">
+    {% csrf_token %}
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Enter Your OTP"
+      name="otp"
+    /><br />
+    <input type="hidden" name="email" value="{{user.email}}" />
+    <input type="submit" class="btn btn-success" value="Verify OTP" />
+  </form>
+  {% else %}
+  <form method="POST">
+    {% csrf_token %}
+    <label>Email</label>
+    <input type="email" class="form-control" name="email" />
+    <label>Password</label>
+    <input type="password" class="form-control" name="password" />
+    <input type="submit" class="btn btn-success" value="Login" />
+  </form>
+  {% endif %}
+</div>
 {% endblock %}
