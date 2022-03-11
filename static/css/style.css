@@ -45,6 +45,7 @@ body {
   padding: 50px 100px;
   width: 80%;
   align-items: stretch;
+  margin: 0 auto;
   justify-content: space-between;
 }
 
