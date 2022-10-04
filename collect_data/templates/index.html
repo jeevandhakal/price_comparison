@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block content %}
+
+  <div class="search">
+    <form method="get" action='{% url 'search' %}'>
+      <input type="search" name="search" />
+      <button type="submit" class="btn">search</button>
+    </form>
+  </div>
+
+  <div class="lists">
+    
+    {% if products %} 
+     {% for product in products %}
+    <div class="list">
+      <div class="img">
+        <img src="{{product.image}}" alt="{{product.title}}" />
+      </div>
+      <div class="details">
+            <a href="{{product.link}}">{{product.title}}</a>
+            <p>{{product.price}}</p>
+            <p>{{product.from}}</p>
+                    <a href="{% url 'wished_product_form' product.id %}"><input type="submit" class="btn btn-success btn-lg" value="Add to Wishlist"></a>
+                   
+      </div>
+      
+    </div>
+   
+    {% endfor %} 
+   
+    {% endif %}
+  </div>
+  
+{% endblock %}
+
+  
