@@ -15,14 +15,18 @@ Welcome to the Nepali E-Commerce Product App! This application provides a stream
 
 1. Clone this repository to your local machine.
 2. Set up a virtual environment and activate it:
+   ```bash
    python -m venv venv
    source venv/bin/activate # On Windows: venv\Scripts\activate
 4. Install the required dependencies:
+   ```bash
    pip install -r requirements.txt
 6. Configure your database settings in `settings.py`.
 7. Apply migrations:
+   ```bash
    python manage.py migrate
 9. Run the development server:
+    ```bash
     python manage.py runserver
 
 ## Usage
