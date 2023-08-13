@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from .script import check_func
+from track_price.script import check_func
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(check_func, 'interval', minutes=1)
+    scheduler.add_job(check_func, 'interval', hours=10)
     scheduler.start()

@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from playwright.sync_api import sync_playwright
 from django.views.decorators.cache import cache_page
 
 from collect_data.models import Scrapper
 from time import perf_counter
+from asyncio import run
 
 
 def index(request):
@@ -14,10 +14,12 @@ def index(request):
 def search(request):
     search_input = request.GET['search']
     start = perf_counter()
-    with sync_playwright() as pw:
-        scrapper = Scrapper(pw, search_input)
-        scrapper.scrape()
-    print("request completed in - ", perf_counter() - start)
+    scrapper = Scrapper(search_input)
+    run(scrapper.scrape())
+    print("scrape completed in - ", perf_counter() - start)
+    start = perf_counter()
+    scrapper.sort()
+    print("sort completed in - ", perf_counter() - start)
     request.session['products'] = scrapper.products
     return render(request, 'index.html', {'products':scrapper.products,})
 
