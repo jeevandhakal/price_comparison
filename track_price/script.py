@@ -1,15 +1,16 @@
 from django.core.mail import send_mail
 from price_comparision import settings
-from collect_data.models import WishList
+from wish_list.models import WishList
 
 from bs4 import BeautifulSoup
-import html5lib
 import requests
 
-import time
 
 def notify_user(product, price):
-    mess= f"Hello {product.user.first_name}! \n The product({product.title}), you wished is now available for price {price} \nPlease visit {product.url} to purchase it.\nThanks!!"
+    mess= f"""Hello {product.user.first_name}!
+        The product({product.title}), you wished is now available for price {price}.
+        Please visit {product.url} to purchase it.
+        Thanks!!"""
     send_mail(
         "Product available",
         mess,
@@ -30,7 +31,6 @@ def track_wishlist():
         available_price =  soup.select_one('p').text
         print(available_price)
 
-
         if wish.site == 'sastodeal' or 'dealayo':
             available_price =  soup.select_one('.price').text
 
@@ -44,3 +44,6 @@ def track_wishlist():
         if available_price <= wish.wanted_price:
             notify_user(wish, available_price)
 
+
+def check_func():
+    print("selery is working! Great!")

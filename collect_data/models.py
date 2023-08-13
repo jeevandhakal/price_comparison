@@ -1,46 +1,76 @@
-from django.db import models
-from user.models import CustomUser
+from bs4 import BeautifulSoup as bs
+from playwright.sync_api import Playwright
+from datetime import datetime
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save
+class Scrapper:
+    def __init__(self, playwright:Playwright, keywords:str):
+        self.keywords = keywords
+        self.browser = playwright.chromium.launch()
+        self.products = []
 
-from bs4 import BeautifulSoup
-import html5lib
-import requests
-
-import time
-
-class WishList(models.Model):
-    title = models.CharField(max_length=150)
-    url = models.CharField(max_length=150)
-    wanted_price = models.IntegerField(default=0)
-    available_price = models.IntegerField(default=0)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    site = models.CharField(max_length=50)
+    @property
+    def new_page(self):
+        return self.browser.new_page()
     
-    def __str__(self):
-        return self.title
+    @property
+    def new_id(self):
+        return int(datetime.now().strftime("%Y%m%d%H%M%S%f"))
 
-    
-@receiver(post_save, sender=WishList)
-def wishlist_post_save_handler(sender, instance, created, *args, **kwargs):
-    if created:
-        pass
-    else:
-        print(instance.url)
-        
-        while True:
-            with open('/home/jeevan/Task/main.html', 'r') as file:
-                content = file.read()
-                soup = BeautifulSoup(content, 'html5lib')
-                available_price =  int(soup.select_one('p').text)
+    def get_sastodeal_products(self):
+        page = self.new_page
+        page.goto(f"https://www.sastodeal.com/catalogsearch/result/?q={self.keywords}")
+        soup = bs(page.content(), 'lxml')
+        product_divs = soup.select('.product-item-info')
+        for div in product_divs:
+            self.products.append({
+                'id': self.new_id,
+                'from': 'Sastodeal',
+                'title': div.select_one('.product-item-name a').text.strip(),
+                'link':div.select_one('.product-item-name a').attrs.get('href'),
+                'price':  div.select_one('.price').text,
+                'image':div.select_one('img').attrs.get('src'),
+            })
 
-                if available_price <= instance.wanted_price:
-                    print('the product is available for', available_price)
-                    break
-                
-                time.sleep(60)
+    def get_daraz_products(self):
+        page = self.new_page
+        page.goto('https://www.daraz.com.np/')  # go to url
 
-        
+        # find search box and enter our query:
+        search_box = page.locator('input#q')
+        search_box.type(self.keywords, delay=100)
 
-    
+        # then, we can either send Enter key:
+        search_box.press("Enter")
+        page.wait_for_timeout(5000)
+        soup = bs(page.content(), 'lxml')
+        product_divs  = soup.select('div[data-qa-locator="product-item"]')
+        for div in product_divs:
+            self.products.append({
+                'id': self.new_id,
+                'from': 'Daraz',
+                'link': 'https:'+div.select_one('.title--wFj93 a').attrs.get('href').split('?')[0],
+                'title': div.select_one('.title--wFj93 a').text.split('|')[0].strip(),
+                'image': div.select_one('img').attrs.get('src'),
+                'price': div.select_one('.price--NVB62 span').text,
+            })
+
+    def get_dealayo_products(self):
+        page = self.new_page
+        page.goto(f'https://www.dealayo.com/catalogsearch/result/?q={self.keywords}')
+
+        soup = bs(page.content(), 'lxml')
+        product_divs = soup.select('.item.product-item')    
+        for div in product_divs:
+            self.products.append({
+                'id': self.new_id,
+                'from': 'Dealayo',
+                'link': div.select_one('.product-name a').attrs.get('href'),
+                'title': div.select_one('.product-name a').text,
+                'image': div.select_one('.amda-product-top a.product-image img').attrs.get('src'),
+                'price': div.select_one('.price').text,
+            })
+
+    def scrape(self):
+        self.get_daraz_products()
+        self.get_sastodeal_products()
+        self.get_dealayo_products()
