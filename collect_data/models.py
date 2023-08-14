@@ -14,66 +14,75 @@ class Scrapper:
         return int(datetime.now().strftime("%Y%m%d%H%M%S%f"))
 
     async def scrape_sastodeal(self):
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            page = await browser.new_page()
-            await page.goto(f"https://www.sastodeal.com/catalogsearch/result/?q={self.keywords}")
-            content = await page.content()
-            soup = bs(content, 'lxml')
-            product_divs = soup.select('.product-item-info')
-            for div in product_divs:
-                self.products.append({
-                    'id': self.new_id,
-                    'from': 'Sastodeal',
-                    'title': div.select_one('.product-item-name a').text.strip(),
-                    'link':div.select_one('.product-item-name a').attrs.get('href'),
-                    'price':  div.select_one('.price').text,
-                    'image':div.select_one('img').attrs.get('src'),
-                })
+        try:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch()
+                page = await browser.new_page()
+                await page.goto(f"https://www.sastodeal.com/catalogsearch/result/?q={self.keywords}")
+                content = await page.content()
+                soup = bs(content, 'lxml')
+                product_divs = soup.select('.product-item-info')
+                for div in product_divs:
+                    self.products.append({
+                        'id': self.new_id,
+                        'from': 'Sastodeal',
+                        'title': div.select_one('.product-item-name a').text.strip(),
+                        'link':div.select_one('.product-item-name a').attrs.get('href'),
+                        'price':  div.select_one('.price').text,
+                        'image':div.select_one('img').attrs.get('src'),
+                    })
+        except Exception as e:
+            print("Error at Daraz", e)
 
     async def scrape_daraz(self):
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            page = await browser.new_page()
-            await page.goto('https://www.daraz.com.np/')  # go to url
+        try:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch()
+                page = await browser.new_page()
+                await page.goto('https://www.daraz.com.np/')  # go to url
 
-            # find search box and enter our query:
-            search_box = page.locator('input#q')
-            await search_box.type(self.keywords, delay=100)
+                # find search box and enter our query:
+                search_box = page.locator('input#q')
+                await search_box.type(self.keywords, delay=100)
 
-            # then, we can either send Enter key:
-            await search_box.press("Enter")
-            await page.wait_for_timeout(1000)
-            content = await page.content()
-            soup = bs(content, 'lxml')
-            product_divs  = soup.select('div[data-qa-locator="product-item"]')
-            for div in product_divs:
-                self.products.append({
-                    'id': self.new_id,
-                    'from': 'Daraz',
-                    'link': 'https:'+div.select_one('.title--wFj93 a').attrs.get('href').split('?')[0],
-                    'title': div.select_one('.title--wFj93 a').text.split('|')[0].strip(),
-                    'image': div.select_one('img').attrs.get('src'),
-                    'price': div.select_one('.price--NVB62 span').text,
-                })
+                # then, we can either send Enter key:
+                await search_box.press("Enter")
+                await page.wait_for_timeout(1000)
+                content = await page.content()
+                soup = bs(content, 'lxml')
+                product_divs  = soup.select('div[data-qa-locator="product-item"]')
+                for div in product_divs:
+                    self.products.append({
+                        'id': self.new_id,
+                        'from': 'Daraz',
+                        'link': 'https:'+div.select_one('.title--wFj93 a').attrs.get('href').split('?')[0],
+                        'title': div.select_one('.title--wFj93 a').text.split('|')[0].strip(),
+                        'image': div.select_one('img').attrs.get('src'),
+                        'price': div.select_one('.price--NVB62 span').text,
+                    })
+        except Exception as e:
+            print("Error at Daraz", e)
 
     async def scrape_dealayo(self):
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            page = await browser.new_page()
-            await page.goto(f'https://www.dealayo.com/catalogsearch/result/?q={self.keywords}')
-            content = await page.content()
-            soup = bs(content, 'lxml')
-            product_divs = soup.select('.item.product-item')    
-            for div in product_divs:
-                self.products.append({
-                    'id': self.new_id,
-                    'from': 'Dealayo',
-                    'link': div.select_one('.product-name a').attrs.get('href'),
-                    'title': div.select_one('.product-name a').text,
-                    'image': div.select_one('.amda-product-top a.product-image img').attrs.get('src'),
-                    'price': div.select_one('.price').text,
-                })
+        try:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch()
+                page = await browser.new_page()
+                await page.goto(f'https://www.dealayo.com/catalogsearch/result/?q={self.keywords}')
+                content = await page.content()
+                soup = bs(content, 'lxml')
+                product_divs = soup.select('.item.product-item')    
+                for div in product_divs:
+                    self.products.append({
+                        'id': self.new_id,
+                        'from': 'Dealayo',
+                        'link': div.select_one('.product-name a').attrs.get('href'),
+                        'title': div.select_one('.product-name a').text,
+                        'image': div.select_one('.amda-product-top a.product-image img').attrs.get('src'),
+                        'price': div.select_one('.price').text,
+                    })
+        except Exception as e:
+            print("Error at Daraz", e)
 
     async def scrape(self):
         tasks = [
