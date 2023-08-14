@@ -8,7 +8,5 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('', include('collect_data.urls')),
     path('wish_list/', include('wish_list.urls')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
