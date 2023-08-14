@@ -18,7 +18,7 @@ SECRET_KEY = os.environ.get('DJANGO_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app', '.now.sh']
+ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
 
 
 # Application definition
@@ -123,6 +123,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
